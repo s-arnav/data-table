@@ -1,0 +1,64 @@
+<pre [innerHTML]="currentSort | json"></pre>
+
+<div class="search-container">
+  <input [formControl]="searchField" />
+  <button (click)="onSearch()">Search</button>
+  <a (click)="clearSearch()">Clear Search</a>
+  <a (click)="clearSort()">Clear Sort</a>
+</div>
+<table class="data-table" *ngIf="displayData">
+  <thead>
+    <th
+      *ngFor="let column of columns"
+      class="data-header-cell"
+      [style]="column.style ?? ''"
+    >
+      <ng-container *ngIf="!column.sortable">{{ column.title }}</ng-container>
+      <ng-container *ngIf="column.sortable">
+        <p
+          *ngIf="
+            (column.sortable && column.field !== currentSort.field) ||
+            !currentSort.order
+          "
+          (click)="onSortByColumn(column.field)"
+        >
+          {{ column.title }} ▲▼
+        </p>
+        <p
+          *ngIf="column.field === currentSort.field && currentSort.order === -1"
+          (click)="onSortByColumn(column.field)"
+        >
+          {{ column.title }} ▼
+        </p>
+        <p
+          *ngIf="column.field === currentSort.field && currentSort.order === 1"
+          (click)="onSortByColumn(column.field)"
+        >
+          {{ column.title }} ▲
+        </p>
+      </ng-container>
+    </th>
+  </thead>
+  <tr
+    *ngFor="let row of displayData"
+    [ngClass]="{ 'selected-row': row.id === selectedRow?.id }"
+    (click)="onRowSelect(row)"
+  >
+    <td
+      *ngFor="let column of columns"
+      class="data-cell"
+      [style]="column.style ?? ''"
+    >
+      {{ row[column.field] }}
+    </td>
+  </tr>
+</table>
+<div class="pager" *ngIf="paging.enabled">
+  <div (click)="getPage(false)">
+    {{ "<" }}
+  </div>
+  <p>{{ currentPage }}</p>
+  <div (click)="getPage(true)">
+    {{ ">" }}
+  </div>
+</div>
